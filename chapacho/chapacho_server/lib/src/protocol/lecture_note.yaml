@@ -1,0 +1,16 @@
+class: LectureNote
+table: lecture_note
+fields:
+  title: String
+  audioPath: String
+  createdAt: DateTime
+  durationSeconds: int?
+  
+  # The raw text of what was said (good for search)
+  transcript: String? 
+  
+  # The "Butler" version: Transcript + Gemini Notes inserted together
+  formattedContent: String? 
+  
+  # We still keep the tags so we can show them as little icons if needed
+  tags: List<NoteTag>?

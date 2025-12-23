@@ -3,6 +3,9 @@ import 'package:audio_waveforms/audio_waveforms.dart';
 import 'package:permission_handler/permission_handler.dart';
 import 'dart:async';
 import 'package:path_provider/path_provider.dart';
+import 'dart:typed_data'; // Needed for file bytes
+import 'package:chapacho_client/chapacho_client.dart'; // Needed to talk to server
+import '../main.dart'; // Needed to access the global 'client' variable
 
 class RecordingScreen extends StatefulWidget {
   const RecordingScreen({super.key});
@@ -91,6 +94,40 @@ class _RecordingScreenState extends State<RecordingScreen> {
     super.dispose();
   }
 
+  Future<void> _testServerConnection() async {
+    print("🔵 TEST: Starting upload check...");
+    try {
+      // 1. Create dummy data (simulating a file)
+      final fileName = "test_${DateTime.now().millisecondsSinceEpoch}.txt";
+      final fileData = ByteData.sublistView(Uint8List.fromList("Hello Serverpod!".codeUnits));
+
+      // 2. Call the Endpoint
+      // We use the 'uploadLecture' method we just wrote in the server
+      final success = await client.lecture.uploadLecture(fileName, fileData);
+
+      if (success) {
+        print("UPLOAD SUCCESS!");
+
+        // 3. Create the Database Entry
+        await client.lecture.saveLectureNote(fileName, []);
+
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text("Success! File uploaded & saved.")),
+        );
+      } else {
+        print("Upload returned false (Check Server Logs)");
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text("Upload failed.")),
+        );
+      }
+    } catch (e) {
+      print("ERROR: $e");
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text("Error: $e")),
+      );
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -105,6 +142,12 @@ class _RecordingScreenState extends State<RecordingScreen> {
             ),
           ),
           
+          // Temporary Test Button
+          ElevatedButton(
+            onPressed: _testServerConnection, 
+            child: const Text("TEST UPLOAD"),
+          ),
+
           // 2. The Voice Spikes
           Container(
             height: 100,

@@ -16,8 +16,10 @@ import 'package:serverpod_client/serverpod_client.dart' as _i2;
 import 'dart:async' as _i3;
 import 'package:serverpod_auth_core_client/serverpod_auth_core_client.dart'
     as _i4;
-import 'package:chapacho_client/src/protocol/greetings/greeting.dart' as _i5;
-import 'protocol.dart' as _i6;
+import 'dart:typed_data' as _i5;
+import 'package:chapacho_client/src/protocol/note_tag.dart' as _i6;
+import 'package:chapacho_client/src/protocol/greetings/greeting.dart' as _i7;
+import 'protocol.dart' as _i8;
 
 /// By extending [EmailIdpBaseEndpoint], the email identity provider endpoints
 /// are made available on the server and enable the corresponding sign-in widget
@@ -233,6 +235,40 @@ class EndpointJwtRefresh extends _i4.EndpointRefreshJwtTokens {
   );
 }
 
+/// {@category Endpoint}
+class EndpointLecture extends _i2.EndpointRef {
+  EndpointLecture(_i2.EndpointCaller caller) : super(caller);
+
+  @override
+  String get name => 'lecture';
+
+  /// 1. Upload the File directly (Simpler method)
+  _i3.Future<bool> uploadLecture(
+    String fileName,
+    _i5.ByteData fileData,
+  ) => caller.callServerEndpoint<bool>(
+    'lecture',
+    'uploadLecture',
+    {
+      'fileName': fileName,
+      'fileData': fileData,
+    },
+  );
+
+  /// 2. Save the Database Entry
+  _i3.Future<bool> saveLectureNote(
+    String fileName,
+    List<_i6.NoteTag> tags,
+  ) => caller.callServerEndpoint<bool>(
+    'lecture',
+    'saveLectureNote',
+    {
+      'fileName': fileName,
+      'tags': tags,
+    },
+  );
+}
+
 /// This is an example endpoint that returns a greeting message through
 /// its [hello] method.
 /// {@category Endpoint}
@@ -243,8 +279,8 @@ class EndpointGreeting extends _i2.EndpointRef {
   String get name => 'greeting';
 
   /// Returns a personalized greeting message: "Hello {name}".
-  _i3.Future<_i5.Greeting> hello(String name) =>
-      caller.callServerEndpoint<_i5.Greeting>(
+  _i3.Future<_i7.Greeting> hello(String name) =>
+      caller.callServerEndpoint<_i7.Greeting>(
         'greeting',
         'hello',
         {'name': name},
@@ -282,7 +318,7 @@ class Client extends _i2.ServerpodClientShared {
     bool? disconnectStreamsOnLostInternetConnection,
   }) : super(
          host,
-         _i6.Protocol(),
+         _i8.Protocol(),
          securityContext: securityContext,
          streamingConnectionTimeout: streamingConnectionTimeout,
          connectionTimeout: connectionTimeout,
@@ -293,6 +329,7 @@ class Client extends _i2.ServerpodClientShared {
        ) {
     emailIdp = EndpointEmailIdp(this);
     jwtRefresh = EndpointJwtRefresh(this);
+    lecture = EndpointLecture(this);
     greeting = EndpointGreeting(this);
     modules = Modules(this);
   }
@@ -300,6 +337,8 @@ class Client extends _i2.ServerpodClientShared {
   late final EndpointEmailIdp emailIdp;
 
   late final EndpointJwtRefresh jwtRefresh;
+
+  late final EndpointLecture lecture;
 
   late final EndpointGreeting greeting;
 
@@ -309,6 +348,7 @@ class Client extends _i2.ServerpodClientShared {
   Map<String, _i2.EndpointRef> get endpointRefLookup => {
     'emailIdp': emailIdp,
     'jwtRefresh': jwtRefresh,
+    'lecture': lecture,
     'greeting': greeting,
   };
 

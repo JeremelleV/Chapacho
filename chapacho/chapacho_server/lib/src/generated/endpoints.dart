@@ -13,11 +13,14 @@
 import 'package:serverpod/serverpod.dart' as _i1;
 import '../auth/email_idp_endpoint.dart' as _i2;
 import '../auth/jwt_refresh_endpoint.dart' as _i3;
-import '../greetings/greeting_endpoint.dart' as _i4;
+import '../endpoints/lecture_endpoints.dart' as _i4;
+import '../greetings/greeting_endpoint.dart' as _i5;
+import 'dart:typed_data' as _i6;
+import 'package:chapacho_server/src/generated/note_tag.dart' as _i7;
 import 'package:serverpod_auth_idp_server/serverpod_auth_idp_server.dart'
-    as _i5;
+    as _i8;
 import 'package:serverpod_auth_core_server/serverpod_auth_core_server.dart'
-    as _i6;
+    as _i9;
 
 class Endpoints extends _i1.EndpointDispatch {
   @override
@@ -35,7 +38,13 @@ class Endpoints extends _i1.EndpointDispatch {
           'jwtRefresh',
           null,
         ),
-      'greeting': _i4.GreetingEndpoint()
+      'lecture': _i4.LectureEndpoint()
+        ..initialize(
+          server,
+          'lecture',
+          null,
+        ),
+      'greeting': _i5.GreetingEndpoint()
         ..initialize(
           server,
           'greeting',
@@ -236,6 +245,62 @@ class Endpoints extends _i1.EndpointDispatch {
         ),
       },
     );
+    connectors['lecture'] = _i1.EndpointConnector(
+      name: 'lecture',
+      endpoint: endpoints['lecture']!,
+      methodConnectors: {
+        'uploadLecture': _i1.MethodConnector(
+          name: 'uploadLecture',
+          params: {
+            'fileName': _i1.ParameterDescription(
+              name: 'fileName',
+              type: _i1.getType<String>(),
+              nullable: false,
+            ),
+            'fileData': _i1.ParameterDescription(
+              name: 'fileData',
+              type: _i1.getType<_i6.ByteData>(),
+              nullable: false,
+            ),
+          },
+          call:
+              (
+                _i1.Session session,
+                Map<String, dynamic> params,
+              ) async =>
+                  (endpoints['lecture'] as _i4.LectureEndpoint).uploadLecture(
+                    session,
+                    params['fileName'],
+                    params['fileData'],
+                  ),
+        ),
+        'saveLectureNote': _i1.MethodConnector(
+          name: 'saveLectureNote',
+          params: {
+            'fileName': _i1.ParameterDescription(
+              name: 'fileName',
+              type: _i1.getType<String>(),
+              nullable: false,
+            ),
+            'tags': _i1.ParameterDescription(
+              name: 'tags',
+              type: _i1.getType<List<_i7.NoteTag>>(),
+              nullable: false,
+            ),
+          },
+          call:
+              (
+                _i1.Session session,
+                Map<String, dynamic> params,
+              ) async =>
+                  (endpoints['lecture'] as _i4.LectureEndpoint).saveLectureNote(
+                    session,
+                    params['fileName'],
+                    params['tags'],
+                  ),
+        ),
+      },
+    );
     connectors['greeting'] = _i1.EndpointConnector(
       name: 'greeting',
       endpoint: endpoints['greeting']!,
@@ -253,16 +318,16 @@ class Endpoints extends _i1.EndpointDispatch {
               (
                 _i1.Session session,
                 Map<String, dynamic> params,
-              ) async => (endpoints['greeting'] as _i4.GreetingEndpoint).hello(
+              ) async => (endpoints['greeting'] as _i5.GreetingEndpoint).hello(
                 session,
                 params['name'],
               ),
         ),
       },
     );
-    modules['serverpod_auth_idp'] = _i5.Endpoints()
+    modules['serverpod_auth_idp'] = _i8.Endpoints()
       ..initializeEndpoints(server);
-    modules['serverpod_auth_core'] = _i6.Endpoints()
+    modules['serverpod_auth_core'] = _i9.Endpoints()
       ..initializeEndpoints(server);
   }
 }

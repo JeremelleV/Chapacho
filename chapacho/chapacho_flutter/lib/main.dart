@@ -36,13 +36,13 @@ void main() async {
   // final serverUrl = serverUrlFromEnv.isEmpty
   //    ? config.apiUrl ?? 'http://$localhost:8080/'
   //    : serverUrlFromEnv;
-  const serverUrl = 'https://chapacho.api.serverpod.space/';
+  const serverUrl = 'http://10.0.2.2:8080/'; //'https://chapacho.api.serverpod.space/';
 
   client = Client(serverUrl)
     ..connectivityMonitor = FlutterConnectivityMonitor()
     ..authSessionManager = FlutterAuthSessionManager();
 
-  client.auth.initialize();
+  await client.auth.initialize();
 
   runApp(const MyApp());
 }

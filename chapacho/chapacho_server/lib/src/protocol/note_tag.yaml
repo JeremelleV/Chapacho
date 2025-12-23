@@ -1,0 +1,4 @@
+class: NoteTag
+fields:
+  type: String # "Funny", "Important", "Question"
+  timestamp: int # Seconds from start
