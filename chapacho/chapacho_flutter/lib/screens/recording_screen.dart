@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:audio_waveforms/audio_waveforms.dart';
 import 'package:permission_handler/permission_handler.dart';
 import 'dart:async';
+import 'package:path_provider/path_provider.dart';
 
 class RecordingScreen extends StatefulWidget {
   const RecordingScreen({super.key});
@@ -23,6 +24,7 @@ class _RecordingScreenState extends State<RecordingScreen> {
   }
 
   void _startRecording() async {
+    // 1. Check Permissions
     final status = await Permission.microphone.request();
     if (status != PermissionStatus.granted) {
       ScaffoldMessenger.of(context).showSnackBar(
@@ -30,27 +32,43 @@ class _RecordingScreenState extends State<RecordingScreen> {
       );
       return; 
     }
-    
-    // FIXED: The record() method now handles the defaults automatically
-    await recorderController.record(); 
+
+    // 2. Get a safe path (FIX for Emulator Hang)
+    final dir = await getApplicationDocumentsDirectory();
+    final path = "${dir.path}/chapacho_recording.m4a";
+
+    // 3. Start recording to that specific path
+    print("🎙️ Starting recording to: $path");
+    await recorderController.record(path: path); 
+
     setState(() {
       isRecording = true;
     });
   }
 
   void _stopRecording() async {
+    print("BUTTON PRESSED: Stopping...");
+    
+    // Stop the recorder
     final path = await recorderController.stop();
+    
     setState(() {
       isRecording = false;
     });
     
-    if (path != null) {
-       print("Audio saved to: $path");
-       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text("Saved to: $path")),
-      );
-    }
-    // TODO: We will send this 'path' to Serverpod in the next step
+    // FIX: Since we defined the path manually in _startRecording, 
+    // we already know where it is!
+    final dir = await getApplicationDocumentsDirectory();
+    final manualPath = "${dir.path}/chapacho_recording.m4a";
+    
+    print("SUCCESS: Recording stopped.");
+    print("File should be at: $manualPath");
+    
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(content: Text("Saved to: $manualPath")),
+    );
+
+    // TODO: Send 'manualPath' to Serverpod
   }
 
   void _addTag(String type) {
