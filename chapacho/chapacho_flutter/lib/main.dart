@@ -5,6 +5,7 @@ import 'package:serverpod_auth_idp_flutter/serverpod_auth_idp_flutter.dart';
 
 import 'config/app_config.dart';
 import 'screens/greetings_screen.dart';
+import 'package:chapacho_flutter/screens/recording_screen.dart';
 
 /// Sets up a global client object that can be used to talk to the server from
 /// anywhere in our app. The client is generated from your server code
@@ -54,7 +55,7 @@ class MyApp extends StatelessWidget {
     return MaterialApp(
       title: 'Serverpod Demo',
       theme: ThemeData(primarySwatch: Colors.blue),
-      home: const MyHomePage(title: 'Serverpod Example'),
+      home: const RecordingScreen(), // const MyHomePage(title: 'Serverpod Example'),
     );
   }
 }
