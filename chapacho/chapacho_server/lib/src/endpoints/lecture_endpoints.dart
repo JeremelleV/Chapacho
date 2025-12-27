@@ -21,9 +21,6 @@ class LectureEndpoint extends Endpoint {
   }
 
   // 2. Save Lecture (SECURE)
-  @override
-  bool get requireLogin => true;
-
   Future<bool> saveLectureNote(Session session, String fileName, List<NoteTag> tags) async {
     final authInfo = await session.authenticated;
     final userId = authInfo?.userId;

@@ -5,6 +5,7 @@ import 'package:serverpod_auth_shared_flutter/serverpod_auth_shared_flutter.dart
 import 'package:serverpod_auth_email_flutter/serverpod_auth_email_flutter.dart';
 
 import 'screens/recording_screen.dart';
+import 'screens/home_screen.dart';
 
 // Global Client
 late final Client client;
@@ -72,7 +73,7 @@ class _AuthGateState extends State<AuthGate> {
   @override
   Widget build(BuildContext context) {
     if (sessionManager.isSignedIn) {
-      return const RecordingScreen();
+      return const HomeScreen();
     }
 
     return Scaffold(
