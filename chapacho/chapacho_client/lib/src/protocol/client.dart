@@ -18,8 +18,10 @@ import 'package:serverpod_auth_core_client/serverpod_auth_core_client.dart'
     as _i4;
 import 'dart:typed_data' as _i5;
 import 'package:chapacho_client/src/protocol/note_tag.dart' as _i6;
-import 'package:chapacho_client/src/protocol/greetings/greeting.dart' as _i7;
-import 'protocol.dart' as _i8;
+import 'package:chapacho_client/src/protocol/lecture_note.dart' as _i7;
+import 'package:chapacho_client/src/protocol/greetings/greeting.dart' as _i8;
+import 'package:serverpod_auth_client/serverpod_auth_client.dart' as _i9;
+import 'protocol.dart' as _i10;
 
 /// By extending [EmailIdpBaseEndpoint], the email identity provider endpoints
 /// are made available on the server and enable the corresponding sign-in widget
@@ -242,7 +244,6 @@ class EndpointLecture extends _i2.EndpointRef {
   @override
   String get name => 'lecture';
 
-  /// 1. Upload the File directly (Simpler method)
   _i3.Future<bool> uploadLecture(
     String fileName,
     _i5.ByteData fileData,
@@ -255,7 +256,6 @@ class EndpointLecture extends _i2.EndpointRef {
     },
   );
 
-  /// 2. Save the Database Entry
   _i3.Future<bool> saveLectureNote(
     String fileName,
     List<_i6.NoteTag> tags,
@@ -267,6 +267,13 @@ class EndpointLecture extends _i2.EndpointRef {
       'tags': tags,
     },
   );
+
+  _i3.Future<List<_i7.LectureNote>> getMyLectures() =>
+      caller.callServerEndpoint<List<_i7.LectureNote>>(
+        'lecture',
+        'getMyLectures',
+        {},
+      );
 }
 
 /// This is an example endpoint that returns a greeting message through
@@ -279,8 +286,8 @@ class EndpointGreeting extends _i2.EndpointRef {
   String get name => 'greeting';
 
   /// Returns a personalized greeting message: "Hello {name}".
-  _i3.Future<_i7.Greeting> hello(String name) =>
-      caller.callServerEndpoint<_i7.Greeting>(
+  _i3.Future<_i8.Greeting> hello(String name) =>
+      caller.callServerEndpoint<_i8.Greeting>(
         'greeting',
         'hello',
         {'name': name},
@@ -290,10 +297,13 @@ class EndpointGreeting extends _i2.EndpointRef {
 class Modules {
   Modules(Client client) {
     serverpod_auth_idp = _i1.Caller(client);
+    auth = _i9.Caller(client);
     serverpod_auth_core = _i4.Caller(client);
   }
 
   late final _i1.Caller serverpod_auth_idp;
+
+  late final _i9.Caller auth;
 
   late final _i4.Caller serverpod_auth_core;
 }
@@ -318,7 +328,7 @@ class Client extends _i2.ServerpodClientShared {
     bool? disconnectStreamsOnLostInternetConnection,
   }) : super(
          host,
-         _i8.Protocol(),
+         _i10.Protocol(),
          securityContext: securityContext,
          streamingConnectionTimeout: streamingConnectionTimeout,
          connectionTimeout: connectionTimeout,
@@ -355,6 +365,7 @@ class Client extends _i2.ServerpodClientShared {
   @override
   Map<String, _i2.ModuleEndpointCaller> get moduleLookup => {
     'serverpod_auth_idp': modules.serverpod_auth_idp,
+    'auth': modules.auth,
     'serverpod_auth_core': modules.serverpod_auth_core,
   };
 }

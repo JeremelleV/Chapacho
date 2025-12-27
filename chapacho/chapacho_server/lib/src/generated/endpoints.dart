@@ -19,8 +19,9 @@ import 'dart:typed_data' as _i6;
 import 'package:chapacho_server/src/generated/note_tag.dart' as _i7;
 import 'package:serverpod_auth_idp_server/serverpod_auth_idp_server.dart'
     as _i8;
+import 'package:serverpod_auth_server/serverpod_auth_server.dart' as _i9;
 import 'package:serverpod_auth_core_server/serverpod_auth_core_server.dart'
-    as _i9;
+    as _i10;
 
 class Endpoints extends _i1.EndpointDispatch {
   @override
@@ -299,6 +300,16 @@ class Endpoints extends _i1.EndpointDispatch {
                     params['tags'],
                   ),
         ),
+        'getMyLectures': _i1.MethodConnector(
+          name: 'getMyLectures',
+          params: {},
+          call:
+              (
+                _i1.Session session,
+                Map<String, dynamic> params,
+              ) async => (endpoints['lecture'] as _i4.LectureEndpoint)
+                  .getMyLectures(session),
+        ),
       },
     );
     connectors['greeting'] = _i1.EndpointConnector(
@@ -327,7 +338,8 @@ class Endpoints extends _i1.EndpointDispatch {
     );
     modules['serverpod_auth_idp'] = _i8.Endpoints()
       ..initializeEndpoints(server);
-    modules['serverpod_auth_core'] = _i9.Endpoints()
+    modules['serverpod_auth'] = _i9.Endpoints()..initializeEndpoints(server);
+    modules['serverpod_auth_core'] = _i10.Endpoints()
       ..initializeEndpoints(server);
   }
 }

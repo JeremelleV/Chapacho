@@ -22,12 +22,10 @@ class _RecordingScreenState extends State<RecordingScreen> {
   @override
   void initState() {
     super.initState();
-    // FIXED: Simplified initialization for version 1.0+
     recorderController = RecorderController();
   }
 
   void _startRecording() async {
-    // 1. Check Permissions
     final status = await Permission.microphone.request();
     if (status != PermissionStatus.granted) {
       ScaffoldMessenger.of(context).showSnackBar(
@@ -36,11 +34,9 @@ class _RecordingScreenState extends State<RecordingScreen> {
       return; 
     }
 
-    // 2. Get a safe path (FIX for Emulator Hang)
     final dir = await getApplicationDocumentsDirectory();
     final path = "${dir.path}/chapacho_recording.m4a";
 
-    // 3. Start recording to that specific path
     print("🎙️ Starting recording to: $path");
     await recorderController.record(path: path); 
 
@@ -59,8 +55,6 @@ class _RecordingScreenState extends State<RecordingScreen> {
       isRecording = false;
     });
     
-    // FIX: Since we defined the path manually in _startRecording, 
-    // we already know where it is!
     final dir = await getApplicationDocumentsDirectory();
     final manualPath = "${dir.path}/chapacho_recording.m4a";
     
@@ -97,18 +91,14 @@ class _RecordingScreenState extends State<RecordingScreen> {
   Future<void> _testServerConnection() async {
     print("🔵 TEST: Starting upload check...");
     try {
-      // 1. Create dummy data (simulating a file)
       final fileName = "test_${DateTime.now().millisecondsSinceEpoch}.txt";
       final fileData = ByteData.sublistView(Uint8List.fromList("Hello Serverpod!".codeUnits));
 
-      // 2. Call the Endpoint
-      // We use the 'uploadLecture' method we just wrote in the server
       final success = await client.lecture.uploadLecture(fileName, fileData);
 
       if (success) {
         print("UPLOAD SUCCESS!");
 
-        // 3. Create the Database Entry
         await client.lecture.saveLectureNote(fileName, []);
 
         ScaffoldMessenger.of(context).showSnackBar(

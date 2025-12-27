@@ -1,6 +1,7 @@
 class: LectureNote
 table: lecture_note
 fields:
+  userId: int
   title: String
   audioPath: String
   createdAt: DateTime
@@ -14,3 +15,7 @@ fields:
   
   # We still keep the tags so we can show them as little icons if needed
   tags: List<NoteTag>?
+  
+indexes:
+  lecture_user_idx:
+    fields: userId, createdAt

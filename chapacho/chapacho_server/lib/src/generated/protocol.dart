@@ -14,12 +14,14 @@ import 'package:serverpod/serverpod.dart' as _i1;
 import 'package:serverpod/protocol.dart' as _i2;
 import 'package:serverpod_auth_idp_server/serverpod_auth_idp_server.dart'
     as _i3;
+import 'package:serverpod_auth_server/serverpod_auth_server.dart' as _i4;
 import 'package:serverpod_auth_core_server/serverpod_auth_core_server.dart'
-    as _i4;
-import 'greetings/greeting.dart' as _i5;
-import 'lecture_note.dart' as _i6;
-import 'note_tag.dart' as _i7;
-import 'package:chapacho_server/src/generated/note_tag.dart' as _i8;
+    as _i5;
+import 'greetings/greeting.dart' as _i6;
+import 'lecture_note.dart' as _i7;
+import 'note_tag.dart' as _i8;
+import 'package:chapacho_server/src/generated/note_tag.dart' as _i9;
+import 'package:chapacho_server/src/generated/lecture_note.dart' as _i10;
 export 'greetings/greeting.dart';
 export 'lecture_note.dart';
 export 'note_tag.dart';
@@ -44,6 +46,12 @@ class Protocol extends _i1.SerializationManagerServer {
           isNullable: false,
           dartType: 'int?',
           columnDefault: 'nextval(\'lecture_note_id_seq\'::regclass)',
+        ),
+        _i2.ColumnDefinition(
+          name: 'userId',
+          columnType: _i2.ColumnType.bigint,
+          isNullable: false,
+          dartType: 'int',
         ),
         _i2.ColumnDefinition(
           name: 'title',
@@ -103,11 +111,29 @@ class Protocol extends _i1.SerializationManagerServer {
           isUnique: true,
           isPrimary: true,
         ),
+        _i2.IndexDefinition(
+          indexName: 'lecture_user_idx',
+          tableSpace: null,
+          elements: [
+            _i2.IndexElementDefinition(
+              type: _i2.IndexElementDefinitionType.column,
+              definition: 'userId',
+            ),
+            _i2.IndexElementDefinition(
+              type: _i2.IndexElementDefinitionType.column,
+              definition: 'createdAt',
+            ),
+          ],
+          type: 'btree',
+          isUnique: false,
+          isPrimary: false,
+        ),
       ],
       managed: true,
     ),
     ..._i3.Protocol.targetTableDefinitions,
     ..._i4.Protocol.targetTableDefinitions,
+    ..._i5.Protocol.targetTableDefinitions,
     ..._i2.Protocol.targetTableDefinitions,
   ];
 
@@ -138,36 +164,42 @@ class Protocol extends _i1.SerializationManagerServer {
       }
     }
 
-    if (t == _i5.Greeting) {
-      return _i5.Greeting.fromJson(data) as T;
+    if (t == _i6.Greeting) {
+      return _i6.Greeting.fromJson(data) as T;
     }
-    if (t == _i6.LectureNote) {
-      return _i6.LectureNote.fromJson(data) as T;
+    if (t == _i7.LectureNote) {
+      return _i7.LectureNote.fromJson(data) as T;
     }
-    if (t == _i7.NoteTag) {
-      return _i7.NoteTag.fromJson(data) as T;
+    if (t == _i8.NoteTag) {
+      return _i8.NoteTag.fromJson(data) as T;
     }
-    if (t == _i1.getType<_i5.Greeting?>()) {
-      return (data != null ? _i5.Greeting.fromJson(data) : null) as T;
+    if (t == _i1.getType<_i6.Greeting?>()) {
+      return (data != null ? _i6.Greeting.fromJson(data) : null) as T;
     }
-    if (t == _i1.getType<_i6.LectureNote?>()) {
-      return (data != null ? _i6.LectureNote.fromJson(data) : null) as T;
+    if (t == _i1.getType<_i7.LectureNote?>()) {
+      return (data != null ? _i7.LectureNote.fromJson(data) : null) as T;
     }
-    if (t == _i1.getType<_i7.NoteTag?>()) {
-      return (data != null ? _i7.NoteTag.fromJson(data) : null) as T;
-    }
-    if (t == List<_i7.NoteTag>) {
-      return (data as List).map((e) => deserialize<_i7.NoteTag>(e)).toList()
-          as T;
-    }
-    if (t == _i1.getType<List<_i7.NoteTag>?>()) {
-      return (data != null
-              ? (data as List).map((e) => deserialize<_i7.NoteTag>(e)).toList()
-              : null)
-          as T;
+    if (t == _i1.getType<_i8.NoteTag?>()) {
+      return (data != null ? _i8.NoteTag.fromJson(data) : null) as T;
     }
     if (t == List<_i8.NoteTag>) {
       return (data as List).map((e) => deserialize<_i8.NoteTag>(e)).toList()
+          as T;
+    }
+    if (t == _i1.getType<List<_i8.NoteTag>?>()) {
+      return (data != null
+              ? (data as List).map((e) => deserialize<_i8.NoteTag>(e)).toList()
+              : null)
+          as T;
+    }
+    if (t == List<_i9.NoteTag>) {
+      return (data as List).map((e) => deserialize<_i9.NoteTag>(e)).toList()
+          as T;
+    }
+    if (t == List<_i10.LectureNote>) {
+      return (data as List)
+              .map((e) => deserialize<_i10.LectureNote>(e))
+              .toList()
           as T;
     }
     try {
@@ -177,6 +209,9 @@ class Protocol extends _i1.SerializationManagerServer {
       return _i4.Protocol().deserialize<T>(data, t);
     } on _i1.DeserializationTypeNotFoundException catch (_) {}
     try {
+      return _i5.Protocol().deserialize<T>(data, t);
+    } on _i1.DeserializationTypeNotFoundException catch (_) {}
+    try {
       return _i2.Protocol().deserialize<T>(data, t);
     } on _i1.DeserializationTypeNotFoundException catch (_) {}
     return super.deserialize<T>(data, t);
@@ -184,9 +219,9 @@ class Protocol extends _i1.SerializationManagerServer {
 
   static String? getClassNameForType(Type type) {
     return switch (type) {
-      _i5.Greeting => 'Greeting',
-      _i6.LectureNote => 'LectureNote',
-      _i7.NoteTag => 'NoteTag',
+      _i6.Greeting => 'Greeting',
+      _i7.LectureNote => 'LectureNote',
+      _i8.NoteTag => 'NoteTag',
       _ => null,
     };
   }
@@ -201,11 +236,11 @@ class Protocol extends _i1.SerializationManagerServer {
     }
 
     switch (data) {
-      case _i5.Greeting():
+      case _i6.Greeting():
         return 'Greeting';
-      case _i6.LectureNote():
+      case _i7.LectureNote():
         return 'LectureNote';
-      case _i7.NoteTag():
+      case _i8.NoteTag():
         return 'NoteTag';
     }
     className = _i2.Protocol().getClassNameForObject(data);
@@ -217,6 +252,10 @@ class Protocol extends _i1.SerializationManagerServer {
       return 'serverpod_auth_idp.$className';
     }
     className = _i4.Protocol().getClassNameForObject(data);
+    if (className != null) {
+      return 'serverpod_auth.$className';
+    }
+    className = _i5.Protocol().getClassNameForObject(data);
     if (className != null) {
       return 'serverpod_auth_core.$className';
     }
@@ -230,13 +269,13 @@ class Protocol extends _i1.SerializationManagerServer {
       return super.deserializeByClassName(data);
     }
     if (dataClassName == 'Greeting') {
-      return deserialize<_i5.Greeting>(data['data']);
+      return deserialize<_i6.Greeting>(data['data']);
     }
     if (dataClassName == 'LectureNote') {
-      return deserialize<_i6.LectureNote>(data['data']);
+      return deserialize<_i7.LectureNote>(data['data']);
     }
     if (dataClassName == 'NoteTag') {
-      return deserialize<_i7.NoteTag>(data['data']);
+      return deserialize<_i8.NoteTag>(data['data']);
     }
     if (dataClassName.startsWith('serverpod.')) {
       data['className'] = dataClassName.substring(10);
@@ -246,9 +285,13 @@ class Protocol extends _i1.SerializationManagerServer {
       data['className'] = dataClassName.substring(19);
       return _i3.Protocol().deserializeByClassName(data);
     }
+    if (dataClassName.startsWith('serverpod_auth.')) {
+      data['className'] = dataClassName.substring(15);
+      return _i4.Protocol().deserializeByClassName(data);
+    }
     if (dataClassName.startsWith('serverpod_auth_core.')) {
       data['className'] = dataClassName.substring(20);
-      return _i4.Protocol().deserializeByClassName(data);
+      return _i5.Protocol().deserializeByClassName(data);
     }
     return super.deserializeByClassName(data);
   }
@@ -268,14 +311,20 @@ class Protocol extends _i1.SerializationManagerServer {
       }
     }
     {
+      var table = _i5.Protocol().getTableForType(t);
+      if (table != null) {
+        return table;
+      }
+    }
+    {
       var table = _i2.Protocol().getTableForType(t);
       if (table != null) {
         return table;
       }
     }
     switch (t) {
-      case _i6.LectureNote:
-        return _i6.LectureNote.t;
+      case _i7.LectureNote:
+        return _i7.LectureNote.t;
     }
     return null;
   }

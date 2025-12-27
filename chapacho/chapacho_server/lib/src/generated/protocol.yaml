@@ -11,5 +11,6 @@ jwtRefresh:
 lecture:
   - uploadLecture:
   - saveLectureNote:
+  - getMyLectures:
 greeting:
   - hello:

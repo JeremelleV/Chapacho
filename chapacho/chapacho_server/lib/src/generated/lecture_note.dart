@@ -18,6 +18,7 @@ abstract class LectureNote
     implements _i1.TableRow<int?>, _i1.ProtocolSerialization {
   LectureNote._({
     this.id,
+    required this.userId,
     required this.title,
     required this.audioPath,
     required this.createdAt,
@@ -29,6 +30,7 @@ abstract class LectureNote
 
   factory LectureNote({
     int? id,
+    required int userId,
     required String title,
     required String audioPath,
     required DateTime createdAt,
@@ -41,6 +43,7 @@ abstract class LectureNote
   factory LectureNote.fromJson(Map<String, dynamic> jsonSerialization) {
     return LectureNote(
       id: jsonSerialization['id'] as int?,
+      userId: jsonSerialization['userId'] as int,
       title: jsonSerialization['title'] as String,
       audioPath: jsonSerialization['audioPath'] as String,
       createdAt: _i1.DateTimeJsonExtension.fromJson(
@@ -64,6 +67,8 @@ abstract class LectureNote
   @override
   int? id;
 
+  int userId;
+
   String title;
 
   String audioPath;
@@ -86,6 +91,7 @@ abstract class LectureNote
   @_i1.useResult
   LectureNote copyWith({
     int? id,
+    int? userId,
     String? title,
     String? audioPath,
     DateTime? createdAt,
@@ -99,6 +105,7 @@ abstract class LectureNote
     return {
       '__className__': 'LectureNote',
       if (id != null) 'id': id,
+      'userId': userId,
       'title': title,
       'audioPath': audioPath,
       'createdAt': createdAt.toJson(),
@@ -114,6 +121,7 @@ abstract class LectureNote
     return {
       '__className__': 'LectureNote',
       if (id != null) 'id': id,
+      'userId': userId,
       'title': title,
       'audioPath': audioPath,
       'createdAt': createdAt.toJson(),
@@ -160,6 +168,7 @@ class _Undefined {}
 class _LectureNoteImpl extends LectureNote {
   _LectureNoteImpl({
     int? id,
+    required int userId,
     required String title,
     required String audioPath,
     required DateTime createdAt,
@@ -169,6 +178,7 @@ class _LectureNoteImpl extends LectureNote {
     List<_i2.NoteTag>? tags,
   }) : super._(
          id: id,
+         userId: userId,
          title: title,
          audioPath: audioPath,
          createdAt: createdAt,
@@ -184,6 +194,7 @@ class _LectureNoteImpl extends LectureNote {
   @override
   LectureNote copyWith({
     Object? id = _Undefined,
+    int? userId,
     String? title,
     String? audioPath,
     DateTime? createdAt,
@@ -194,6 +205,7 @@ class _LectureNoteImpl extends LectureNote {
   }) {
     return LectureNote(
       id: id is int? ? id : this.id,
+      userId: userId ?? this.userId,
       title: title ?? this.title,
       audioPath: audioPath ?? this.audioPath,
       createdAt: createdAt ?? this.createdAt,
@@ -213,6 +225,11 @@ class _LectureNoteImpl extends LectureNote {
 
 class LectureNoteUpdateTable extends _i1.UpdateTable<LectureNoteTable> {
   LectureNoteUpdateTable(super.table);
+
+  _i1.ColumnValue<int, int> userId(int value) => _i1.ColumnValue(
+    table.userId,
+    value,
+  );
 
   _i1.ColumnValue<String, String> title(String value) => _i1.ColumnValue(
     table.title,
@@ -257,6 +274,10 @@ class LectureNoteUpdateTable extends _i1.UpdateTable<LectureNoteTable> {
 class LectureNoteTable extends _i1.Table<int?> {
   LectureNoteTable({super.tableRelation}) : super(tableName: 'lecture_note') {
     updateTable = LectureNoteUpdateTable(this);
+    userId = _i1.ColumnInt(
+      'userId',
+      this,
+    );
     title = _i1.ColumnString(
       'title',
       this,
@@ -289,6 +310,8 @@ class LectureNoteTable extends _i1.Table<int?> {
 
   late final LectureNoteUpdateTable updateTable;
 
+  late final _i1.ColumnInt userId;
+
   late final _i1.ColumnString title;
 
   late final _i1.ColumnString audioPath;
@@ -306,6 +329,7 @@ class LectureNoteTable extends _i1.Table<int?> {
   @override
   List<_i1.Column> get columns => [
     id,
+    userId,
     title,
     audioPath,
     createdAt,
