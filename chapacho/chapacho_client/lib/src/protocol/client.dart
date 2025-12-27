@@ -16,12 +16,10 @@ import 'package:serverpod_client/serverpod_client.dart' as _i2;
 import 'dart:async' as _i3;
 import 'package:serverpod_auth_core_client/serverpod_auth_core_client.dart'
     as _i4;
-import 'dart:typed_data' as _i5;
-import 'package:chapacho_client/src/protocol/note_tag.dart' as _i6;
-import 'package:chapacho_client/src/protocol/lecture_note.dart' as _i7;
-import 'package:chapacho_client/src/protocol/greetings/greeting.dart' as _i8;
-import 'package:serverpod_auth_client/serverpod_auth_client.dart' as _i9;
-import 'protocol.dart' as _i10;
+import 'package:chapacho_client/src/protocol/lecture.dart' as _i5;
+import 'package:chapacho_client/src/protocol/greetings/greeting.dart' as _i6;
+import 'package:serverpod_auth_client/serverpod_auth_client.dart' as _i7;
+import 'protocol.dart' as _i8;
 
 /// By extending [EmailIdpBaseEndpoint], the email identity provider endpoints
 /// are made available on the server and enable the corresponding sign-in widget
@@ -244,35 +242,18 @@ class EndpointLecture extends _i2.EndpointRef {
   @override
   String get name => 'lecture';
 
-  _i3.Future<bool> uploadLecture(
-    String fileName,
-    _i5.ByteData fileData,
-  ) => caller.callServerEndpoint<bool>(
-    'lecture',
-    'uploadLecture',
-    {
-      'fileName': fileName,
-      'fileData': fileData,
-    },
-  );
-
-  _i3.Future<bool> saveLectureNote(
-    String fileName,
-    List<_i6.NoteTag> tags,
-  ) => caller.callServerEndpoint<bool>(
-    'lecture',
-    'saveLectureNote',
-    {
-      'fileName': fileName,
-      'tags': tags,
-    },
-  );
-
-  _i3.Future<List<_i7.LectureNote>> getMyLectures() =>
-      caller.callServerEndpoint<List<_i7.LectureNote>>(
+  _i3.Future<List<_i5.Lecture>> getMyLectures() =>
+      caller.callServerEndpoint<List<_i5.Lecture>>(
         'lecture',
         'getMyLectures',
         {},
+      );
+
+  _i3.Future<bool> saveLecture(_i5.Lecture lecture) =>
+      caller.callServerEndpoint<bool>(
+        'lecture',
+        'saveLecture',
+        {'lecture': lecture},
       );
 }
 
@@ -286,8 +267,8 @@ class EndpointGreeting extends _i2.EndpointRef {
   String get name => 'greeting';
 
   /// Returns a personalized greeting message: "Hello {name}".
-  _i3.Future<_i8.Greeting> hello(String name) =>
-      caller.callServerEndpoint<_i8.Greeting>(
+  _i3.Future<_i6.Greeting> hello(String name) =>
+      caller.callServerEndpoint<_i6.Greeting>(
         'greeting',
         'hello',
         {'name': name},
@@ -297,13 +278,13 @@ class EndpointGreeting extends _i2.EndpointRef {
 class Modules {
   Modules(Client client) {
     serverpod_auth_idp = _i1.Caller(client);
-    auth = _i9.Caller(client);
+    auth = _i7.Caller(client);
     serverpod_auth_core = _i4.Caller(client);
   }
 
   late final _i1.Caller serverpod_auth_idp;
 
-  late final _i9.Caller auth;
+  late final _i7.Caller auth;
 
   late final _i4.Caller serverpod_auth_core;
 }
@@ -328,7 +309,7 @@ class Client extends _i2.ServerpodClientShared {
     bool? disconnectStreamsOnLostInternetConnection,
   }) : super(
          host,
-         _i10.Protocol(),
+         _i8.Protocol(),
          securityContext: securityContext,
          streamingConnectionTimeout: streamingConnectionTimeout,
          connectionTimeout: connectionTimeout,

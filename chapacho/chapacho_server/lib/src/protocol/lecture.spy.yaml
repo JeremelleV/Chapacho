@@ -1,0 +1,10 @@
+class: Lecture
+table: lecture
+fields:
+  title: String
+  date: DateTime
+  durationSeconds: int
+  userId: int
+  # Store the list of blocks as a raw JSON string. 
+  # It's lighter on the database than creating 1000 rows for 1000 sentences.
+  contentJson: String

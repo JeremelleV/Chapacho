@@ -18,13 +18,10 @@ import 'package:serverpod_auth_server/serverpod_auth_server.dart' as _i4;
 import 'package:serverpod_auth_core_server/serverpod_auth_core_server.dart'
     as _i5;
 import 'greetings/greeting.dart' as _i6;
-import 'lecture_note.dart' as _i7;
-import 'note_tag.dart' as _i8;
-import 'package:chapacho_server/src/generated/note_tag.dart' as _i9;
-import 'package:chapacho_server/src/generated/lecture_note.dart' as _i10;
+import 'lecture.dart' as _i7;
+import 'package:chapacho_server/src/generated/lecture.dart' as _i8;
 export 'greetings/greeting.dart';
-export 'lecture_note.dart';
-export 'note_tag.dart';
+export 'lecture.dart';
 
 class Protocol extends _i1.SerializationManagerServer {
   Protocol._();
@@ -35,8 +32,8 @@ class Protocol extends _i1.SerializationManagerServer {
 
   static final List<_i2.TableDefinition> targetTableDefinitions = [
     _i2.TableDefinition(
-      name: 'lecture_note',
-      dartName: 'LectureNote',
+      name: 'lecture',
+      dartName: 'Lecture',
       schema: 'public',
       module: 'chapacho',
       columns: [
@@ -45,13 +42,7 @@ class Protocol extends _i1.SerializationManagerServer {
           columnType: _i2.ColumnType.bigint,
           isNullable: false,
           dartType: 'int?',
-          columnDefault: 'nextval(\'lecture_note_id_seq\'::regclass)',
-        ),
-        _i2.ColumnDefinition(
-          name: 'userId',
-          columnType: _i2.ColumnType.bigint,
-          isNullable: false,
-          dartType: 'int',
+          columnDefault: 'nextval(\'lecture_id_seq\'::regclass)',
         ),
         _i2.ColumnDefinition(
           name: 'title',
@@ -60,13 +51,7 @@ class Protocol extends _i1.SerializationManagerServer {
           dartType: 'String',
         ),
         _i2.ColumnDefinition(
-          name: 'audioPath',
-          columnType: _i2.ColumnType.text,
-          isNullable: false,
-          dartType: 'String',
-        ),
-        _i2.ColumnDefinition(
-          name: 'createdAt',
+          name: 'date',
           columnType: _i2.ColumnType.timestampWithoutTimeZone,
           isNullable: false,
           dartType: 'DateTime',
@@ -74,32 +59,26 @@ class Protocol extends _i1.SerializationManagerServer {
         _i2.ColumnDefinition(
           name: 'durationSeconds',
           columnType: _i2.ColumnType.bigint,
-          isNullable: true,
-          dartType: 'int?',
+          isNullable: false,
+          dartType: 'int',
         ),
         _i2.ColumnDefinition(
-          name: 'transcript',
+          name: 'userId',
+          columnType: _i2.ColumnType.bigint,
+          isNullable: false,
+          dartType: 'int',
+        ),
+        _i2.ColumnDefinition(
+          name: 'contentJson',
           columnType: _i2.ColumnType.text,
-          isNullable: true,
-          dartType: 'String?',
-        ),
-        _i2.ColumnDefinition(
-          name: 'formattedContent',
-          columnType: _i2.ColumnType.text,
-          isNullable: true,
-          dartType: 'String?',
-        ),
-        _i2.ColumnDefinition(
-          name: 'tags',
-          columnType: _i2.ColumnType.json,
-          isNullable: true,
-          dartType: 'List<protocol:NoteTag>?',
+          isNullable: false,
+          dartType: 'String',
         ),
       ],
       foreignKeys: [],
       indexes: [
         _i2.IndexDefinition(
-          indexName: 'lecture_note_pkey',
+          indexName: 'lecture_pkey',
           tableSpace: null,
           elements: [
             _i2.IndexElementDefinition(
@@ -110,23 +89,6 @@ class Protocol extends _i1.SerializationManagerServer {
           type: 'btree',
           isUnique: true,
           isPrimary: true,
-        ),
-        _i2.IndexDefinition(
-          indexName: 'lecture_user_idx',
-          tableSpace: null,
-          elements: [
-            _i2.IndexElementDefinition(
-              type: _i2.IndexElementDefinitionType.column,
-              definition: 'userId',
-            ),
-            _i2.IndexElementDefinition(
-              type: _i2.IndexElementDefinitionType.column,
-              definition: 'createdAt',
-            ),
-          ],
-          type: 'btree',
-          isUnique: false,
-          isPrimary: false,
         ),
       ],
       managed: true,
@@ -167,39 +129,17 @@ class Protocol extends _i1.SerializationManagerServer {
     if (t == _i6.Greeting) {
       return _i6.Greeting.fromJson(data) as T;
     }
-    if (t == _i7.LectureNote) {
-      return _i7.LectureNote.fromJson(data) as T;
-    }
-    if (t == _i8.NoteTag) {
-      return _i8.NoteTag.fromJson(data) as T;
+    if (t == _i7.Lecture) {
+      return _i7.Lecture.fromJson(data) as T;
     }
     if (t == _i1.getType<_i6.Greeting?>()) {
       return (data != null ? _i6.Greeting.fromJson(data) : null) as T;
     }
-    if (t == _i1.getType<_i7.LectureNote?>()) {
-      return (data != null ? _i7.LectureNote.fromJson(data) : null) as T;
+    if (t == _i1.getType<_i7.Lecture?>()) {
+      return (data != null ? _i7.Lecture.fromJson(data) : null) as T;
     }
-    if (t == _i1.getType<_i8.NoteTag?>()) {
-      return (data != null ? _i8.NoteTag.fromJson(data) : null) as T;
-    }
-    if (t == List<_i8.NoteTag>) {
-      return (data as List).map((e) => deserialize<_i8.NoteTag>(e)).toList()
-          as T;
-    }
-    if (t == _i1.getType<List<_i8.NoteTag>?>()) {
-      return (data != null
-              ? (data as List).map((e) => deserialize<_i8.NoteTag>(e)).toList()
-              : null)
-          as T;
-    }
-    if (t == List<_i9.NoteTag>) {
-      return (data as List).map((e) => deserialize<_i9.NoteTag>(e)).toList()
-          as T;
-    }
-    if (t == List<_i10.LectureNote>) {
-      return (data as List)
-              .map((e) => deserialize<_i10.LectureNote>(e))
-              .toList()
+    if (t == List<_i8.Lecture>) {
+      return (data as List).map((e) => deserialize<_i8.Lecture>(e)).toList()
           as T;
     }
     try {
@@ -220,8 +160,7 @@ class Protocol extends _i1.SerializationManagerServer {
   static String? getClassNameForType(Type type) {
     return switch (type) {
       _i6.Greeting => 'Greeting',
-      _i7.LectureNote => 'LectureNote',
-      _i8.NoteTag => 'NoteTag',
+      _i7.Lecture => 'Lecture',
       _ => null,
     };
   }
@@ -238,10 +177,8 @@ class Protocol extends _i1.SerializationManagerServer {
     switch (data) {
       case _i6.Greeting():
         return 'Greeting';
-      case _i7.LectureNote():
-        return 'LectureNote';
-      case _i8.NoteTag():
-        return 'NoteTag';
+      case _i7.Lecture():
+        return 'Lecture';
     }
     className = _i2.Protocol().getClassNameForObject(data);
     if (className != null) {
@@ -271,11 +208,8 @@ class Protocol extends _i1.SerializationManagerServer {
     if (dataClassName == 'Greeting') {
       return deserialize<_i6.Greeting>(data['data']);
     }
-    if (dataClassName == 'LectureNote') {
-      return deserialize<_i7.LectureNote>(data['data']);
-    }
-    if (dataClassName == 'NoteTag') {
-      return deserialize<_i8.NoteTag>(data['data']);
+    if (dataClassName == 'Lecture') {
+      return deserialize<_i7.Lecture>(data['data']);
     }
     if (dataClassName.startsWith('serverpod.')) {
       data['className'] = dataClassName.substring(10);
@@ -323,8 +257,8 @@ class Protocol extends _i1.SerializationManagerServer {
       }
     }
     switch (t) {
-      case _i7.LectureNote:
-        return _i7.LectureNote.t;
+      case _i7.Lecture:
+        return _i7.Lecture.t;
     }
     return null;
   }

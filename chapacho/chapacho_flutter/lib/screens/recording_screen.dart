@@ -1,3 +1,4 @@
+import 'package:chapacho_flutter/singletons.dart';
 import 'package:flutter/material.dart';
 import 'package:audio_waveforms/audio_waveforms.dart';
 import 'package:permission_handler/permission_handler.dart';
@@ -6,6 +7,9 @@ import 'package:path_provider/path_provider.dart';
 import 'dart:typed_data'; // Needed for file bytes
 import 'package:chapacho_client/chapacho_client.dart'; // Needed to talk to server
 import '../main.dart'; // Needed to access the global 'client' variable
+import 'dart:async'; // for Timer
+import 'package:chapacho_client/chapacho_client.dart';
+import '../models/lecture_block.dart'; // Import your helper
 
 class RecordingScreen extends StatefulWidget {
   const RecordingScreen({super.key});
@@ -25,6 +29,10 @@ class _RecordingScreenState extends State<RecordingScreen> {
     recorderController = RecorderController();
   }
 
+  List<LectureBlock> generatedBlocks = [];
+  Timer? _simulationTimer;
+  int _seconds = 0;
+
   void _startRecording() async {
     final status = await Permission.microphone.request();
     if (status != PermissionStatus.granted) {
@@ -43,10 +51,43 @@ class _RecordingScreenState extends State<RecordingScreen> {
     setState(() {
       isRecording = true;
     });
+
+    _simulationTimer = Timer.periodic(const Duration(seconds: 3), (timer) {
+        _seconds += 3;
+        setState(() {
+          generatedBlocks.add(LectureBlock(
+            text: "The professor is explaining concept #$_seconds... blah blah blah.",
+            timestampSeconds: _seconds,
+            tag: null, // Default is no tag
+          ));
+        });
+    });
+  }
+
+  void _addTag(String type) {
+    if (!isRecording) return;
+    
+    // Convert the LAST block to be tagged
+    if (generatedBlocks.isNotEmpty) {
+      final lastBlock = generatedBlocks.last;
+      
+      // Replace the last block with a tagged version
+      generatedBlocks[generatedBlocks.length - 1] = LectureBlock(
+        text: lastBlock.text + " (Marked as $type!)",
+        timestampSeconds: lastBlock.timestampSeconds,
+        tag: type,
+      );
+      
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text("Tagged: $type")),
+      );
+    }
   }
 
   void _stopRecording() async {
     print("BUTTON PRESSED: Stopping...");
+
+    _simulationTimer?.cancel();
     
     // Stop the recorder
     final path = await recorderController.stop();
@@ -54,68 +95,36 @@ class _RecordingScreenState extends State<RecordingScreen> {
     setState(() {
       isRecording = false;
     });
-    
-    final dir = await getApplicationDocumentsDirectory();
-    final manualPath = "${dir.path}/chapacho_recording.m4a";
-    
-    print("SUCCESS: Recording stopped.");
-    print("File should be at: $manualPath");
-    
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(content: Text("Saved to: $manualPath")),
-    );
 
-    // TODO: Send 'manualPath' to Serverpod
-  }
+    try {
+      final jsonString = LectureBlock.encodeList(generatedBlocks);
+      
+      final newLecture = Lecture(
+        title: "Lecture ${DateTime.now().hour}:${DateTime.now().minute}",
+        date: DateTime.now(),
+        durationSeconds: _seconds,
+        userId: 0, // Server ignores this
+        contentJson: jsonString, // <--- THE DATA
+      );
 
-  void _addTag(String type) {
-    if (!isRecording) return;
-    
-    final timestamp = recorderController.elapsedDuration.inSeconds;
-    tags.add({'type': type, 'timestamp': timestamp});
-    
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(
-        content: Text("Chapacho noted: $type at ${timestamp}s"), 
-        duration: const Duration(milliseconds: 600),
-      ),
-    );
+      final success = await client.lecture.saveLecture(newLecture);
+      
+      if (success) {
+        if (mounted) Navigator.pop(context); // Go back to Home
+      } else {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text("Failed to save to Serverpod.")),
+        );
+      }
+    } catch (e) {
+      print("Save Error: $e");
+    }
   }
 
   @override
   void dispose() {
     recorderController.dispose();
     super.dispose();
-  }
-
-  Future<void> _testServerConnection() async {
-    print("🔵 TEST: Starting upload check...");
-    try {
-      final fileName = "test_${DateTime.now().millisecondsSinceEpoch}.txt";
-      final fileData = ByteData.sublistView(Uint8List.fromList("Hello Serverpod!".codeUnits));
-
-      final success = await client.lecture.uploadLecture(fileName, fileData);
-
-      if (success) {
-        print("UPLOAD SUCCESS!");
-
-        await client.lecture.saveLectureNote(fileName, []);
-
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text("Success! File uploaded & saved.")),
-        );
-      } else {
-        print("Upload returned false (Check Server Logs)");
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text("Upload failed.")),
-        );
-      }
-    } catch (e) {
-      print("ERROR: $e");
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text("Error: $e")),
-      );
-    }
   }
 
   @override
@@ -131,13 +140,7 @@ class _RecordingScreenState extends State<RecordingScreen> {
               child: Icon(Icons.person_pin, size: 100, color: Colors.grey),
             ),
           ),
-          
-          // Temporary Test Button
-          ElevatedButton(
-            onPressed: _testServerConnection, 
-            child: const Text("TEST UPLOAD"),
-          ),
-
+                
           // 2. The Voice Spikes
           Container(
             height: 100,

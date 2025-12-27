@@ -1,7 +1,9 @@
+import 'package:chapacho_flutter/singletons.dart';
 import 'package:flutter/material.dart';
-import 'package:chapacho_client/chapacho_client.dart'; // For LectureNote class
-import '../main.dart'; // For 'client' and 'sessionManager'
+import 'package:chapacho_client/chapacho_client.dart'; 
+import '../main.dart'; 
 import 'recording_screen.dart';
+import 'document_screen.dart'; 
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -11,8 +13,7 @@ class HomeScreen extends StatefulWidget {
 }
 
 class _HomeScreenState extends State<HomeScreen> {
-  // Variable to hold the list of notes
-  List<LectureNote>? _lectures;
+  List<Lecture>? _lectures;
   bool _isLoading = true;
 
   @override
@@ -21,10 +22,10 @@ class _HomeScreenState extends State<HomeScreen> {
     _loadLectures();
   }
 
-  // Fetch data from the Server
   Future<void> _loadLectures() async {
     setState(() => _isLoading = true);
     try {
+      // This matches your new Endpoint function
       final lectures = await client.lecture.getMyLectures();
       setState(() {
         _lectures = lectures;
@@ -42,24 +43,19 @@ class _HomeScreenState extends State<HomeScreen> {
       appBar: AppBar(
         title: const Text("My Lectures"),
         actions: [
-          // LOGOUT BUTTON
           IconButton(
             icon: const Icon(Icons.logout),
-            onPressed: () {
-              sessionManager.signOutDevice();
-            },
+            onPressed: () => sessionManager.signOutDevice(),
           ),
         ],
       ),
-      // FLOATING ACTION BUTTON -> Go to Recording Screen
       floatingActionButton: FloatingActionButton.extended(
         onPressed: () async {
-          // Wait for the user to come back, then reload the list
           await Navigator.push(
             context,
             MaterialPageRoute(builder: (context) => const RecordingScreen()),
           );
-          _loadLectures();
+          _loadLectures(); // Refresh when back
         },
         label: const Text("Record New"),
         icon: const Icon(Icons.mic),
@@ -91,7 +87,7 @@ class _HomeScreenState extends State<HomeScreen> {
     return ListView.builder(
       itemCount: _lectures!.length,
       itemBuilder: (context, index) {
-        final note = _lectures![index];
+        final lecture = _lectures![index];
         return Card(
           margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
           child: ListTile(
@@ -99,16 +95,19 @@ class _HomeScreenState extends State<HomeScreen> {
               backgroundColor: Colors.deepPurple,
               child: Icon(Icons.graphic_eq, color: Colors.white),
             ),
-            title: Text(note.title),
+            title: Text(lecture.title),
             subtitle: Text(
-              "Created: ${note.createdAt.toString().split('.')[0]}",
+              "Created: ${lecture.date.toString().split('.')[0]}",
               style: const TextStyle(fontSize: 12),
             ),
             trailing: const Icon(Icons.arrow_forward_ios, size: 16),
             onTap: () {
-              // TODO: Open the "Full Doc" viewer here
-              ScaffoldMessenger.of(context).showSnackBar(
-                  SnackBar(content: Text("Opening ${note.title}..."))
+              // NAVIGATE TO VIEWER
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (context) => DocumentScreen(lecture: lecture),
+                ),
               );
             },
           ),

@@ -9,8 +9,7 @@ emailIdp:
 jwtRefresh:
   - refreshAccessToken:
 lecture:
-  - uploadLecture:
-  - saveLectureNote:
   - getMyLectures:
+  - saveLecture:
 greeting:
   - hello:

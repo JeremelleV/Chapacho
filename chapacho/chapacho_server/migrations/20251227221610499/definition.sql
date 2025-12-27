@@ -30,22 +30,16 @@ language plpgsql
 volatile;
 
 --
--- Class LectureNote as table lecture_note
+-- Class Lecture as table lecture
 --
-CREATE TABLE "lecture_note" (
+CREATE TABLE "lecture" (
     "id" bigserial PRIMARY KEY,
-    "userId" bigint NOT NULL,
     "title" text NOT NULL,
-    "audioPath" text NOT NULL,
-    "createdAt" timestamp without time zone NOT NULL,
-    "durationSeconds" bigint,
-    "transcript" text,
-    "formattedContent" text,
-    "tags" json
+    "date" timestamp without time zone NOT NULL,
+    "durationSeconds" bigint NOT NULL,
+    "userId" bigint NOT NULL,
+    "contentJson" text NOT NULL
 );
-
--- Indexes
-CREATE INDEX "lecture_user_idx" ON "lecture_note" USING btree ("userId", "createdAt");
 
 --
 -- Class CloudStorageEntry as table serverpod_cloud_storage
@@ -723,9 +717,9 @@ ALTER TABLE ONLY "serverpod_auth_core_session"
 -- MIGRATION VERSION FOR chapacho
 --
 INSERT INTO "serverpod_migrations" ("module", "version", "timestamp")
-    VALUES ('chapacho', '20251227011553646', now())
+    VALUES ('chapacho', '20251227221610499', now())
     ON CONFLICT ("module")
-    DO UPDATE SET "version" = '20251227011553646', "timestamp" = now();
+    DO UPDATE SET "version" = '20251227221610499', "timestamp" = now();
 
 --
 -- MIGRATION VERSION FOR serverpod

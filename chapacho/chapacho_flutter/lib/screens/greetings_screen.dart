@@ -1,3 +1,4 @@
+import 'package:chapacho_flutter/singletons.dart';
 import 'package:flutter/material.dart';
 
 import '../main.dart';
